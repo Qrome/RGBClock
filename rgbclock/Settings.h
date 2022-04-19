@@ -42,6 +42,7 @@ SOFTWARE.
 #include <ESP8266HTTPUpdateServer.h>
 #include "TimeClient.h"
 #include "FS.h"
+#include <Adafruit_NeoPixel.h>
 
 
 //******************************
@@ -60,6 +61,7 @@ char* www_password = "password";  // Password for the Web Interface
 
 // Display Settings
 const int RGB_LED_PIN = D3;
+const int NUMPIXELS = 12; // this is the number of pixels in the RGB Ring
 
 // LED Settings
 const int externalLight = LED_BUILTIN; // LED will always flash on bootup or Wifi Errors

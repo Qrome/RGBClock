@@ -90,8 +90,27 @@ String TimeClient::getHours() {
       return "0" + String(hours);
     }
     return String(hours); // print the hour (86400 equals secs per day)
-
 }
+
+int TimeClient::getHoursInt() {
+    if (localEpoc == 0) {
+      return 0;
+    }
+    int hours = ((getCurrentEpochWithUtcOffset()  % 86400L) / 3600) % 24;
+    return hours; // print the hour (86400 equals secs per day)
+}
+
+int TimeClient::get12HoursInt() {
+    if (localEpoc == 0) {
+      return 0;
+    }
+    int hours = ((getCurrentEpochWithUtcOffset()  % 86400L) / 3600) % 24;
+    if (hours > 11) {
+      hours = hours -12;
+    }
+    return hours; // print the hour (86400 equals secs per day)
+}
+
 String TimeClient::getMinutes() {
     if (localEpoc == 0) {
       return "--";
@@ -103,6 +122,15 @@ String TimeClient::getMinutes() {
     }
     return String(minutes);
 }
+
+int TimeClient::getMinutesInt() {
+    if (localEpoc == 0) {
+      return 0;
+    }
+    int minutes = ((getCurrentEpochWithUtcOffset() % 3600) / 60);
+    return minutes;
+}
+
 String TimeClient::getSeconds() {
     if (localEpoc == 0) {
       return "--";
@@ -113,6 +141,14 @@ String TimeClient::getSeconds() {
       return "0" + String(seconds);
     }
     return String(seconds);
+}
+
+int TimeClient::getSecondsInt() {
+    if (localEpoc == 0) {
+      return 0;
+    }
+    int seconds = getCurrentEpochWithUtcOffset() % 60;
+    return seconds;
 }
 
 String TimeClient::getAmPmHours() {

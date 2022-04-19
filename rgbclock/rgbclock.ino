@@ -51,7 +51,23 @@ long displayOffEpoch = 0;
 String lastMinute = "xx";
 String lastSecond = "xx";
 String lastReportStatus = "";
-boolean displayOn = true;
+
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, RGB_LED_PIN, NEO_GRB + NEO_KHZ800);
+
+long day = 86400000; // 86400000 milliseconds in a day
+long hour = 3600000; // 3600000 milliseconds in an hour
+long minute = 60000; // 60000 milliseconds in a minute
+long second =  1000; // 1000 milliseconds in a second
+
+uint32_t HOUR_COLOR   = pixels.Color(255, 0, 0);
+uint32_t MINUTE_COLOR = pixels.Color(0, 255, 0);
+uint32_t SECOND_COLOR = pixels.Color(0, 0, 255);
+uint32_t fire_color   = pixels.Color(80,35, 0);
+uint32_t off_color    = pixels.Color(0, 0, 0);
+
+int secondsLED = 0;
+int minutesLED = 0;
+int hoursLED = 0;
 
 //declairing prototypes
 void configModeCallback (WiFiManager *myWiFiManager);
@@ -195,7 +211,14 @@ void setup() {
   String webAddress = "http://" + WiFi.localIP().toString() + ":" + String(WEBSERVER_PORT) + "/";
   Serial.println("Use this URL : " + webAddress);
 
-  flashLED(5, 100);
+  pixels.begin();
+  pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS);
+  pixels.show();
+
+  IPAddress ip = WiFi.localIP(); //IPAddress(192, 168, 0, 9);
+  displayIP(ip[3]);
+
+  flashLED(1, 100);
   Serial.println("*** Leaving setup()");
 }
 
@@ -209,10 +232,85 @@ void loop() {
     getUpdateTime();
   }
 
+  updateLED();
+
   server.handleClient();
   
   if (ENABLE_OTA) {
     ArduinoOTA.handle();
+  }
+}
+
+void updateLED() {
+  secondsLED = timeClient.getSecondsInt()/5;
+  minutesLED = timeClient.getMinutesInt()/5;
+  hoursLED = timeClient.get12HoursInt();
+
+  pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS); // set all off
+  
+  if (secondsLED == minutesLED && minutesLED == hoursLED) {
+    pixels.setPixelColor(secondsLED, pixels.Color(255, 255, 255));
+  } else if (secondsLED == minutesLED) {
+    pixels.setPixelColor(secondsLED, pixels.Color(0, 255, 255));
+    pixels.setPixelColor(hoursLED, HOUR_COLOR);
+  } else if (secondsLED == hoursLED) {
+    pixels.setPixelColor(secondsLED, pixels.Color(255, 0, 255));
+    pixels.setPixelColor(minutesLED, MINUTE_COLOR);
+  } else if (minutesLED == hoursLED) {
+    pixels.setPixelColor(minutesLED, pixels.Color(255, 255, 0));
+    pixels.setPixelColor(secondsLED, SECOND_COLOR);
+  } else {
+    pixels.setPixelColor(secondsLED, SECOND_COLOR);
+    pixels.setPixelColor(minutesLED, MINUTE_COLOR);
+    pixels.setPixelColor(hoursLED, HOUR_COLOR);
+  }
+  pixels.show();
+}
+
+void displayIP(byte octet) {
+  Serial.println("Last octet: " + String(octet));
+  String ip = String(octet);
+  char digits[ip.length()];
+  ip.toCharArray(digits, ip.length()+1);
+
+  for (int inx = 0; inx < 50; inx++) {
+    if (ip.length() == 3) {
+      if (digits[0] == digits[1] && digits[1] == digits[2]) {
+        pixels.setPixelColor(String(digits[0]).toInt(), pixels.Color(255, 255, 255));
+      } else if (digits[0] == digits[1]) {
+        pixels.setPixelColor(String(digits[0]).toInt(), pixels.Color(255, 255, 0));
+        pixels.setPixelColor(String(digits[2]).toInt(), SECOND_COLOR);
+      } else if (digits[1] == digits[2]) {
+        pixels.setPixelColor(String(digits[1]).toInt(), pixels.Color(0, 255, 255));
+        pixels.setPixelColor(String(digits[0]).toInt(), HOUR_COLOR);
+      } else if (digits[0] == digits[2]) {
+        pixels.setPixelColor(String(digits[0]).toInt(), pixels.Color(255, 0, 255));
+        pixels.setPixelColor(String(digits[1]).toInt(), HOUR_COLOR);
+      } else {
+        pixels.setPixelColor(String(digits[2]).toInt(), SECOND_COLOR);
+        pixels.setPixelColor(String(digits[1]).toInt(), MINUTE_COLOR);
+        pixels.setPixelColor(String(digits[0]).toInt(), HOUR_COLOR);
+      }
+    } else if (ip.length() == 2) {
+      if (digits[0] == digits[1]) {
+        pixels.setPixelColor(String(digits[0]).toInt(), pixels.Color(255, 255, 0));
+      } else {
+        pixels.setPixelColor(String(digits[1]).toInt(), MINUTE_COLOR);
+        pixels.setPixelColor(String(digits[0]).toInt(), HOUR_COLOR);
+      }
+    } else if (ip.length() == 1) {
+      pixels.setPixelColor(String(digits[0]).toInt(), HOUR_COLOR);
+    }
+    pixels.show();
+    delay(100);
+    pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS); // set all off
+    pixels.show();
+    delay(50);
+  }
+
+  for (int inx = 0; inx <= 20; inx++) {
+    RollingFire(80);
+    delay(random(40,200));
   }
 }
 
@@ -550,4 +648,90 @@ void readSettings() {
 int getMinutesFromLastRefresh() {
   int minutes = (timeClient.getCurrentEpoch() - lastEpoch) / 60;
   return minutes;
+}
+
+///
+/// Set all colors
+///
+void RollingFire(int offset) {
+  Clear();
+  
+  for(int i=0; i < NUMPIXELS; i++) {
+    AddColor(i, fire_color);
+    int r = random(offset);
+    uint32_t diff_color = pixels.Color (r, r/2, r/2);
+    SubstractColor(i, diff_color);
+  }
+  pixels.show();
+}
+
+///
+/// Every LED to black
+///
+void Clear() {
+  for(uint16_t i = 0; i < pixels.numPixels(); i++) {
+    pixels.setPixelColor(i, off_color);
+  }
+}
+
+///
+/// Set color of LED
+///
+void AddColor(uint8_t position, uint32_t color) {
+  uint32_t blended_color = Blend(pixels.getPixelColor(position), color);
+  pixels.setPixelColor(position, blended_color);
+}
+
+///
+/// Set color of LED
+///
+void SubstractColor(uint8_t position, uint32_t color) {
+  uint32_t blended_color = Substract(pixels.getPixelColor(position), color);
+  pixels.setPixelColor(position, blended_color);
+}
+
+///
+/// Color blending
+///
+uint32_t Blend(uint32_t color1, uint32_t color2) {
+  uint8_t r1,g1,b1;
+  uint8_t r2,g2,b2;
+  uint8_t r3,g3,b3;
+  
+  r1 = (uint8_t)(color1 >> 16),
+  g1 = (uint8_t)(color1 >>  8),
+  b1 = (uint8_t)(color1 >>  0);
+  
+  r2 = (uint8_t)(color2 >> 16),
+  g2 = (uint8_t)(color2 >>  8),
+  b2 = (uint8_t)(color2 >>  0);
+  
+  return pixels.Color(constrain(r1+r2, 0, 255), constrain(g1+g2, 0, 255), constrain(b1+b2, 0, 255));
+}
+
+///
+/// Color blending
+///
+uint32_t Substract(uint32_t color1, uint32_t color2) {
+  uint8_t r1,g1,b1;
+  uint8_t r2,g2,b2;
+  uint8_t r3,g3,b3;
+  int16_t r,g,b;
+  
+  r1 = (uint8_t)(color1 >> 16),
+  g1 = (uint8_t)(color1 >>  8),
+  b1 = (uint8_t)(color1 >>  0);
+  
+  r2 = (uint8_t)(color2 >> 16),
+  g2 = (uint8_t)(color2 >>  8),
+  b2 = (uint8_t)(color2 >>  0);
+  
+  r=(int16_t)r1-(int16_t)r2;
+  g=(int16_t)g1-(int16_t)g2;
+  b=(int16_t)b1-(int16_t)b2;
+  if(r<0) r=0;
+  if(g<0) g=0;
+  if(b<0) b=0;
+  
+  return pixels.Color(r, g, b);
 }

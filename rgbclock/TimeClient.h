@@ -49,14 +49,17 @@ class TimeClient {
     
     void setUtcOffset(float utcOffset);
     String getHours();
+    int getHoursInt();
+    int get12HoursInt();
     String getAmPmHours();
     String getAmPm();
     String getMinutes();
+    int getMinutesInt();
     String getSeconds();
+    int getSecondsInt();
     String getFormattedTime();
     String getAmPmFormattedTime();
     long getCurrentEpoch();
     long getCurrentEpochWithUtcOffset();
 
 };
-
