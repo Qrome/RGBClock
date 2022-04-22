@@ -65,10 +65,6 @@ uint32_t SECOND_COLOR = pixels.Color(0, 0, 255);
 uint32_t fire_color   = pixels.Color(80,35, 0);
 uint32_t off_color    = pixels.Color(0, 0, 0);
 
-int secondsLED = 0;
-int minutesLED = 0;
-int hoursLED = 0;
-
 //declairing prototypes
 void configModeCallback (WiFiManager *myWiFiManager);
 int8_t getWifiQuality();
@@ -242,11 +238,21 @@ void loop() {
 }
 
 void updateLED() {
-  secondsLED = timeClient.getSecondsInt()/5;
-  minutesLED = timeClient.getMinutesInt()/5;
-  hoursLED = timeClient.get12HoursInt();
+  int hotSecondsLED = timeClient.getSecondsInt()%12;
+  int secondsLED = timeClient.getSecondsInt()/5;
+  int minutesLED = timeClient.getMinutesInt()/5;
+  int hoursLED = timeClient.get12HoursInt();
+
+  if (timeClient.getMinutesInt()%5 >= 3) {
+    minutesLED += 1;
+    if (minutesLED == 12) {
+      minutesLED = 0;
+    }
+  }
 
   pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS); // set all off
+
+  pixels.setPixelColor(hotSecondsLED, pixels.Color(5, 5, 5));
   
   if (secondsLED == minutesLED && minutesLED == hoursLED) {
     pixels.setPixelColor(secondsLED, pixels.Color(255, 255, 255));
@@ -309,7 +315,7 @@ void displayIP(byte octet) {
   }
 
   for (int inx = 0; inx <= 20; inx++) {
-    RollingFire(80);
+    RollingFire(85);
     delay(random(40,200));
   }
 }
