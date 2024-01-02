@@ -50,9 +50,9 @@ NOTE: The Wemos D1 Mini requires a 2.4Ghz network.
 After connected to your WiFi network it will display the IP addressed assigned to it and that can be 
 used to open a browser to the Web Interface.  **Everything** can be configured there.
 
-<img src="/imgages/screen1.png" alt="image" style="width:200px;height:auto;">
-<img src="/imgages/screen2.png" alt="image" style="width:200px;height:auto;">
-<img src="/imgages/screen3.png" alt="image" style="width:200px;height:auto;">
+<img src="imgages/screen1.png" alt="image" style="width:200px;height:auto;">
+<img src="imgages/screen2.png" alt="image" style="width:200px;height:auto;">
+<img src="imgages/screen3.png" alt="image" style="width:200px;height:auto;">
 
 ## Donate or Tip
 Please do not feel obligated, but donations and tips are warmly welcomed.  I have added the donation button at the request of a few people that wanted to contribute and show appreciation.  Thank you, and enjoy the application and project.  
