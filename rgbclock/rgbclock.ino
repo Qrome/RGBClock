@@ -80,7 +80,7 @@ static const char WEB_ACTIONS[] PROGMEM =  "<a class='w3-bar-item w3-button' hre
                       "<a class='w3-bar-item w3-button' href='https://github.com/Qrome' target='_blank'><i class='fa fa-question-circle'></i> About</a>";
 
 static const char CLOCK_FORM[] PROGMEM = "<p>UTC Time Offset <select <select class='w3-option w3-padding' name='utcoffset'>%UTCOFFSET%</select>"
-                      "<a class='w3-bar-item w3-button' alt='About UTC Offset' href='https://en.wikipedia.org/wiki/UTC_offset' target='_blank'><i class='fa fa-question-circle'></i></a></p>"
+                      "<a class='w3-button' alt='About UTC Offset' href='https://en.wikipedia.org/wiki/UTC_offset' target='_blank'><i class='fa fa-question-circle'></i></a></p>"
                       "<p>Clock Sync Refresh (minutes) <select class='w3-option w3-padding' name='refresh'>%OPTIONS%</select></p>"
                       "<p><label>Brightness %</label>"
                       "<input type='range' value='%BRIGHT%' min='1' max='100' oninput='this.nextElementSibling.value = this.value' name='bright'><output>%BRIGHT%</output></p>";
@@ -232,7 +232,7 @@ void setup() {
 
   IPAddress ip = WiFi.localIP(); //IPAddress(192, 168, 0, 9);
   displayIP(ip[3]);
-
+  
   applyBrightness();
   
   flashLED(1, 100);
@@ -485,7 +485,8 @@ String getHeader(boolean refresh) {
   html += "<div class='w3-padding'>Menu</div></div>";
   html += menu;
   html += "</nav>";
-  html += "<header class='w3-top w3-bar w3-theme'><button class='w3-bar-item w3-button w3-xxxlarge w3-hover-theme' onclick='openSidebar()'><i class='fa fa-bars'></i></button><h2 class='w3-bar-item'>RGB Clock</h2></header>";
+  html += "<header class='w3-top w3-bar w3-theme'><button class='w3-bar-item w3-button w3-xxxlarge w3-hover-theme' onclick='openSidebar()'><i class='fa fa-bars'></i></button><h2 class='w3-bar-item'>";
+  html += "<span style='color:red;'>R</span><span style='color:green;'>G</span><span style='color:blue;'>B</span> Clock</h2></header>";
   html += "<script>";
   html += "function openSidebar(){document.getElementById('mySidebar').style.display='block'}function closeSidebar(){document.getElementById('mySidebar').style.display='none'}closeSidebar();";
   html += "</script>";
@@ -525,11 +526,15 @@ void displayStatus() {
 
   String displayTime = timeClient.getAmPmHours() + ":" + timeClient.getMinutes() + ":" + timeClient.getSeconds() + " " + timeClient.getAmPm();
   
-  html += "<div class='w3-cell w3-container' style='width:100%'><p>";
- 
-  html += "</p></div></div>";
+  html += "<div class='w3-cell w3-container' style='width:100%'>";
 
-  html += "<div class='w3-cell-row' style='width:100%'><h2>Time: " + displayTime + " <a class='w3-bar-item w3-button' href='/configure'><i class='fa fa-cog'></i> Configure</a></h2></div>";
+  html += "<div class='w3-cell-row' style='width:100%'><h2>Time: " + displayTime + " <a class='w3-button' href='/configure'><i class='fa fa-cog'></i> Configure</a></h2></div>";
+  html += "<hr><div class='w3-cell-row' style='width:100%'>";
+  html += "<p><span style='color:red;'>RED</span> - Hour Hand</p>";
+  html += "<p><span style='color:green;'>GREEN</span> - Minute Hand</p>";
+  html += "<p><span style='color:blue;'>BLUE</span> - Second Hand</p>";
+  html += "<p>*WHITE - Seconds Ticking</p>";
+  html += "</div></div>";
 
   server.sendContent(html); // spit out what we got
   html = "";
