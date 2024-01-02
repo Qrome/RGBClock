@@ -74,38 +74,57 @@ ESP8266HTTPUpdateServer serverUpdater;
 
 static const char WEB_ACTIONS[] PROGMEM =  "<a class='w3-bar-item w3-button' href='/'><i class='fa fa-home'></i> Home</a>"
                       "<a class='w3-bar-item w3-button' href='/configure'><i class='fa fa-cog'></i> Configure</a>"
-                      "<a class='w3-bar-item w3-button' href='/configureweather'><i class='fa fa-cloud'></i> Weather</a>"
                       "<a class='w3-bar-item w3-button' href='/systemreset' onclick='return confirm(\"Do you want to reset to default settings?\")'><i class='fa fa-undo'></i> Reset Settings</a>"
                       "<a class='w3-bar-item w3-button' href='/forgetwifi' onclick='return confirm(\"Do you want to forget to WiFi connection?\")'><i class='fa fa-wifi'></i> Forget WiFi</a>"
                       "<a class='w3-bar-item w3-button' href='/update'><i class='fa fa-wrench'></i> Firmware Update</a>"
                       "<a class='w3-bar-item w3-button' href='https://github.com/Qrome' target='_blank'><i class='fa fa-question-circle'></i> About</a>";
 
-String CHANGE_FORM =  ""; // moved to config to make it dynamic
-
-static const char CLOCK_FORM[] PROGMEM = "<hr><p><input name='isClockEnabled' class='w3-check w3-margin-top' type='checkbox' %IS_CLOCK_CHECKED%> Display Clock when printer is off</p>"
-                      "<p><input name='is24hour' class='w3-check w3-margin-top' type='checkbox' %IS_24HOUR_CHECKED%> Use 24 Hour Clock (military time)</p>"
-                      "<p><input name='invDisp' class='w3-check w3-margin-top' type='checkbox' %IS_INVDISP_CHECKED%> Flip display orientation</p>"
-                      "<p><input name='useFlash' class='w3-check w3-margin-top' type='checkbox' %USEFLASH%> Flash System LED on Service Calls</p>"
-                      "<p><input name='hasPSU' class='w3-check w3-margin-top' type='checkbox' %HAS_PSU_CHECKED%> Use OctoPrint PSU control plugin for clock/blank</p>"
-                      "<p>Clock Sync / Weather Refresh (minutes) <select class='w3-option w3-padding' name='refresh'>%OPTIONS%</select></p>";
+static const char CLOCK_FORM[] PROGMEM = "<p>UTC Time Offset <select <select class='w3-option w3-padding' name='utcoffset'>%UTCOFFSET%</select>"
+                      "<a class='w3-bar-item w3-button' alt='About UTC Offset' href='https://en.wikipedia.org/wiki/UTC_offset' target='_blank'><i class='fa fa-question-circle'></i></a></p>"
+                      "<p>Clock Sync Refresh (minutes) <select class='w3-option w3-padding' name='refresh'>%OPTIONS%</select></p>"
+                      "<p><label>Brightness %</label>"
+                      "<input type='range' value='%BRIGHT%' min='1' max='100' oninput='this.nextElementSibling.value = this.value' name='bright'><output>%BRIGHT%</output></p>";
                             
 static const char THEME_FORM[] PROGMEM =   "<p>Theme Color <select class='w3-option w3-padding' name='theme'>%THEME_OPTIONS%</select></p>"
-                      "<p><label>UTC Time Offset</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='utcoffset' value='%UTCOFFSET%' maxlength='12'></p><hr>"
-                      "<p><input name='isBasicAuth' class='w3-check w3-margin-top' type='checkbox' %IS_BASICAUTH_CHECKED%> Use Security Credentials for Configuration Changes</p>"
-                      "<p><label>User ID (for this interface)</label><input class='w3-input w3-border w3-margin-bottom' type='text' name='userid' value='%USERID%' maxlength='20'></p>"
-                      "<p><label>Password </label><input class='w3-input w3-border w3-margin-bottom' type='password' name='stationpassword' value='%STATIONPASSWORD%'></p>"
                       "<button class='w3-button w3-block w3-grey w3-section w3-padding' type='submit'>Save</button></form>";
 
-static const char WEATHER_FORM[] PROGMEM = "<form class='w3-container' action='/updateweatherconfig' method='get'><h2>Weather Config:</h2>"
-                      "<p><input name='isWeatherEnabled' class='w3-check w3-margin-top' type='checkbox' %IS_WEATHER_CHECKED%> Display Weather when printer is off</p>"
-                      "<label>OpenWeatherMap API Key (get from <a href='https://openweathermap.org/' target='_BLANK'>here</a>)</label>"
-                      "<input class='w3-input w3-border w3-margin-bottom' type='text' name='openWeatherMapApiKey' value='%WEATHERKEY%' maxlength='60'>"
-                      "<p><label>%CITYNAME1% (<a href='http://openweathermap.org/find' target='_BLANK'><i class='fa fa-search'></i> Search for City ID</a>) "
-                      "<input class='w3-input w3-border w3-margin-bottom' type='text' name='city1' value='%CITY1%' onkeypress='return isNumberKey(event)'></p>"
-                      "<p><input name='metric' class='w3-check w3-margin-top' type='checkbox' %METRIC%> Use Metric (Celsius)</p>"
-                      "<p>Weather Language <select class='w3-option w3-padding' name='language'>%LANGUAGEOPTIONS%</select></p>"
-                      "<button class='w3-button w3-block w3-grey w3-section w3-padding' type='submit'>Save</button></form>"
-                      "<script>function isNumberKey(e){var h=e.which?e.which:event.keyCode;return!(h>31&&(h<48||h>57))}</script>";
+static const char UTC_OFFSETS[] PROGMEM = "<option>-12.00</option>"
+                      "<option>-11.00</option>"
+                      "<option>-10.00</option>"
+                      "<option>-9.00</option>"
+                      "<option>-8.00</option>"
+                      "<option>-7.00</option>"
+                      "<option>-6.00</option>"
+                      "<option>-5.00</option>"
+                      "<option>-4.00</option>"
+                      "<option>-3.00</option>"
+                      "<option>-2.00</option>"
+                      "<option>-1.00</option>"
+                      "<option>0.00</option>"
+                      "<option>1.00</option>"
+                      "<option>2.00</option>"
+                      "<option>3.00</option>"
+                      "<option>3.50</option>"
+                      "<option>4.00</option>"
+                      "<option>4.50</option>"
+                      "<option>5.00</option>"
+                      "<option>5.50</option>"
+                      "<option>5.75</option>"
+                      "<option>6.00</option>"
+                      "<option>6.50</option>"
+                      "<option>7.00</option>"
+                      "<option>8.00</option>"
+                      "<option>8.75</option>"
+                      "<option>9.00</option>"
+                      "<option>9.50</option>"
+                      "<option>10.00</option>"
+                      "<option>10.50</option>"
+                      "<option>11.00</option>"
+                      "<option>11.50</option>"
+                      "<option>12.00</option>"
+                      "<option>12.75</option>"
+                      "<option>13.00</option>"
+                      "<option>14.00</option>";
 
 static const char COLOR_THEMES[] PROGMEM = "<option>red</option>"
                       "<option>pink</option>"
@@ -145,6 +164,10 @@ void setup() {
 
   readSettings();
  
+  pixels.begin();
+  pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS);
+  pixels.show();
+
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wifiManager;
@@ -207,13 +230,11 @@ void setup() {
   String webAddress = "http://" + WiFi.localIP().toString() + ":" + String(WEBSERVER_PORT) + "/";
   Serial.println("Use this URL : " + webAddress);
 
-  pixels.begin();
-  pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS);
-  pixels.show();
-
   IPAddress ip = WiFi.localIP(); //IPAddress(192, 168, 0, 9);
   displayIP(ip[3]);
 
+  applyBrightness();
+  
   flashLED(1, 100);
   Serial.println("*** Leaving setup()");
 }
@@ -318,6 +339,16 @@ void displayIP(byte octet) {
     RollingFire(85);
     delay(random(40,200));
   }
+  pixels.fill(pixels.Color(0, 40, 0), 0, NUMPIXELS); // Green For Loading
+  pixels.show();
+}
+
+void applyBrightness() {
+  uint8_t adjusted = uint8_t(round(255.0 * (brightness/100.0)));
+  Serial.println("Adjusted Brightness: " + String(adjusted));
+  HOUR_COLOR   = pixels.Color(adjusted, 0, 0);
+  MINUTE_COLOR = pixels.Color(0, adjusted, 0);
+  SECOND_COLOR = pixels.Color(0, 0, adjusted);
 }
 
 void getUpdateTime() {
@@ -329,13 +360,6 @@ void getUpdateTime() {
   Serial.println("Local time: " + timeClient.getAmPmFormattedTime());
 
   ledOnOff(false);  // turn off the LED
-}
-
-boolean authentication() {
-  if (IS_BASIC_AUTH && (strlen(www_username) >= 1 && strlen(www_password) >= 1)) {
-    return server.authenticate(www_username, www_password);
-  } 
-  return true; // Authentication not required
 }
 
 //ONLY USED in Special Build
@@ -351,9 +375,6 @@ void handleResetAdmin() {
 }
 
 void handleSystemReset() {
-  if (!authentication()) {
-    return server.requestAuthentication();
-  }
   Serial.println("Reset System Configuration");
   if (SPIFFS.remove(CONFIG)) {
     redirectHome();
@@ -362,38 +383,29 @@ void handleSystemReset() {
 }
 
 void handleUpdateConfig() {
-  if (!authentication()) {
-    return server.requestAuthentication();
-  }
   USE_FLASH = server.hasArg("useFlash");
   minutesBetweenDataRefresh = server.arg("refresh").toInt();
   themeColor = server.arg("theme");
   UtcOffset = server.arg("utcoffset").toFloat();
-  String temp = server.arg("userid");
-  temp.toCharArray(www_username, sizeof(temp));
-  temp = server.arg("stationpassword");
-  temp.toCharArray(www_password, sizeof(temp));
+  brightness = server.arg("bright").toInt();
   writeSettings();
   lastEpoch = 0;
   redirectHome();
 }
 
 void handleWifiReset() {
-  if (!authentication()) {
-    return server.requestAuthentication();
-  }
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
   redirectHome();
   WiFiManager wifiManager;
   wifiManager.resetSettings();
-  ESP.restart();
+  ESP.eraseConfig();
+  Clear(); 
+  delay(2000);
+  ESP.reset(); 
 }
 
 void handleConfigure() {
-  if (!authentication()) {
-    return server.requestAuthentication();
-  }
   ledOnOff(true);
   String html = "";
 
@@ -406,12 +418,17 @@ void handleConfigure() {
   html = getHeader();
   server.sendContent(html);
   
-  String form = CHANGE_FORM;
+  html = "<form class='w3-container' action='/updateconfig' method='get'><h2>Configuration:</h2>";
+  server.sendContent(html);
 
-  server.sendContent(form);
+  String form = FPSTR(CLOCK_FORM);
 
-  form = FPSTR(CLOCK_FORM);
+  form.replace("%BRIGHT%", String(brightness));
   
+  String utcOffsets = FPSTR(UTC_OFFSETS);
+  utcOffsets.replace(">" + String(UtcOffset, 2) + "<", " selected>" + String(UtcOffset, 2) + "<");
+  form.replace("%UTCOFFSET%", utcOffsets);
+
   String options = "<option>10</option><option>15</option><option>20</option><option>30</option><option>60</option>";
   options.replace(">"+String(minutesBetweenDataRefresh)+"<", " selected>"+String(minutesBetweenDataRefresh)+"<");
   form.replace("%OPTIONS%", options);
@@ -423,14 +440,6 @@ void handleConfigure() {
   String themeOptions = FPSTR(COLOR_THEMES);
   themeOptions.replace(">"+String(themeColor)+"<", " selected>"+String(themeColor)+"<");
   form.replace("%THEME_OPTIONS%", themeOptions);
-  form.replace("%UTCOFFSET%", String(UtcOffset));
-  String isUseSecurityChecked = "";
-  if (IS_BASIC_AUTH) {
-    isUseSecurityChecked = "checked='checked'";
-  }
-  form.replace("%IS_BASICAUTH_CHECKED%", isUseSecurityChecked);
-  form.replace("%USERID%", String(www_username));
-  form.replace("%STATIONPASSWORD%", String(www_password));
 
   server.sendContent(form);
   
@@ -459,7 +468,7 @@ String getHeader(boolean refresh) {
   String menu = FPSTR(WEB_ACTIONS);
 
   String html = "<!DOCTYPE HTML>";
-  html += "<html><head><title>Printer Monitor</title><link rel='icon' href='data:;base64,='>";
+  html += "<html><head><title>RGB Clock</title><link rel='icon' href='data:;base64,='>";
   html += "<meta charset='UTF-8'>";
   html += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
   if (refresh) {
@@ -476,7 +485,7 @@ String getHeader(boolean refresh) {
   html += "<div class='w3-padding'>Menu</div></div>";
   html += menu;
   html += "</nav>";
-  html += "<header class='w3-top w3-bar w3-theme'><button class='w3-bar-item w3-button w3-xxxlarge w3-hover-theme' onclick='openSidebar()'><i class='fa fa-bars'></i></button><h2 class='w3-bar-item'>Printer Monitor</h2></header>";
+  html += "<header class='w3-top w3-bar w3-theme'><button class='w3-bar-item w3-button w3-xxxlarge w3-hover-theme' onclick='openSidebar()'><i class='fa fa-bars'></i></button><h2 class='w3-bar-item'>RGB Clock</h2></header>";
   html += "<script>";
   html += "function openSidebar(){document.getElementById('mySidebar').style.display='block'}function closeSidebar(){document.getElementById('mySidebar').style.display='none'}closeSidebar();";
   html += "</script>";
@@ -516,12 +525,11 @@ void displayStatus() {
 
   String displayTime = timeClient.getAmPmHours() + ":" + timeClient.getMinutes() + ":" + timeClient.getSeconds() + " " + timeClient.getAmPm();
   
-  html += "<div class='w3-cell-row' style='width:100%'><h2>RGB Clock</h2></div><div class='w3-cell-row'>";
   html += "<div class='w3-cell w3-container' style='width:100%'><p>";
  
   html += "</p></div></div>";
 
-  html += "<div class='w3-cell-row' style='width:100%'><h2>Time: " + displayTime + "</h2></div>";
+  html += "<div class='w3-cell-row' style='width:100%'><h2>Time: " + displayTime + " <a class='w3-bar-item w3-button' href='/configure'><i class='fa fa-cog'></i> Configure</a></h2></div>";
 
   server.sendContent(html); // spit out what we got
   html = "";
@@ -539,6 +547,8 @@ void configModeCallback (WiFiManager *myWiFiManager) {
   Serial.println("Please connect to AP");
   Serial.println(myWiFiManager->getConfigPortalSSID());
   Serial.println("To setup Wifi Configuration");
+  pixels.fill(pixels.Color(0, 0, 100), 0, NUMPIXELS);
+  pixels.show();
   flashLED(20, 50);
 }
 
@@ -591,14 +601,15 @@ void writeSettings() {
     Serial.println("Saving settings now...");
     f.println("UtcOffset=" + String(UtcOffset));
     f.println("refreshRate=" + String(minutesBetweenDataRefresh));
+    f.println("brightness=" + String(brightness));
     f.println("themeColor=" + themeColor);
-    f.println("IS_BASIC_AUTH=" + String(IS_BASIC_AUTH));
     f.println("www_username=" + String(www_username));
     f.println("www_password=" + String(www_password));;
     f.println("USE_FLASH=" + String(USE_FLASH));
   }
   f.close();
   readSettings();
+  applyBrightness();
   timeClient.setUtcOffset(UtcOffset);
 }
 
@@ -617,6 +628,10 @@ void readSettings() {
       UtcOffset = line.substring(line.lastIndexOf("UtcOffset=") + 10).toFloat();
       Serial.println("UtcOffset=" + String(UtcOffset));
     }
+    if (line.indexOf("brightness=") >= 0) {
+      brightness = line.substring(line.lastIndexOf("brightness=") + 11).toInt();
+      Serial.println("brightness=" + String(brightness));
+    }
     if (line.indexOf("refreshRate=") >= 0) {
       minutesBetweenDataRefresh = line.substring(line.lastIndexOf("refreshRate=") + 12).toInt();
       Serial.println("minutesBetweenDataRefresh=" + String(minutesBetweenDataRefresh));
@@ -625,10 +640,6 @@ void readSettings() {
       themeColor = line.substring(line.lastIndexOf("themeColor=") + 11);
       themeColor.trim();
       Serial.println("themeColor=" + themeColor);
-    }
-    if (line.indexOf("IS_BASIC_AUTH=") >= 0) {
-      IS_BASIC_AUTH = line.substring(line.lastIndexOf("IS_BASIC_AUTH=") + 14).toInt();
-      Serial.println("IS_BASIC_AUTH=" + String(IS_BASIC_AUTH));
     }
     if (line.indexOf("www_username=") >= 0) {
       String temp = line.substring(line.lastIndexOf("www_username=") + 13);

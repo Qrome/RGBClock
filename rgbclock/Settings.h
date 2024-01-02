@@ -1,6 +1,6 @@
 /** The MIT License (MIT)
 
-Copyright (c) 2018 David Payne
+Copyright (c) 2024 David Payne
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ SOFTWARE.
 
 
 /******************************************************************************
- * Printer Monitor is designed for the Wemos D1 ESP8266
+ * RGB Clock is designed for the Wemos D1 ESP8266 and 12 bit RGB Ring
  * Wemos D1 Mini:  https://amzn.to/2qLyKJd
  ******************************************************************************/
 /******************************************************************************
@@ -52,10 +52,10 @@ SOFTWARE.
 // Date and Time
 float UtcOffset = -7; // Hour offset from GMT for your timezone
 int minutesBetweenDataRefresh = 30; // this is time refresh only
+int brightness = 50;  // percentage of brightness of the main clock RGB from 1 - 100
 
 // Webserver
 const int WEBSERVER_PORT = 80; // The port you can access this device on over HTTP
-boolean IS_BASIC_AUTH = false;  // true = require athentication to change configuration settings / false = no auth
 char* www_username = "admin";  // User account for the Web Interface
 char* www_password = "password";  // Password for the Web Interface
 
@@ -75,4 +75,4 @@ String OTA_Password = "";      // Set an OTA password here -- leave blank if you
 // End Settings
 //******************************
 
-String themeColor = "amber"; // this can be changed later in the web interface.
+String themeColor = "yellow"; // this can be changed later in the web interface.
