@@ -16,7 +16,7 @@
 
 Note: Using the links provided here help to support these types of projects. Thank you for the support.  
 
-## Wiring for the Wemos D1 Mini to the RGB Ring
+## Wiring for the Wemos D1 Mini to the RGB Ring:
 RBB Pin -> D3  
 5V Pin -> VCC
 Ground -> Ground
