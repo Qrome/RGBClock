@@ -9,6 +9,10 @@
 * Offers Advanced Web Interface for changing settings
 * Select the UTC Offset for your time zone
 * Control the brightness
+* Uses accurate internet time from Google servers.
+* Uses WifiManager to easily configure to your 2.4Ghz network.
+* Displays the last octet (the fourth and final set of numbers in an IPv4 address) when it boots up.
+* Waste time trying to tell the time.
 
 ## Required Parts:
 * Wemos D1 Mini: https://amzn.to/2ImqD1n
@@ -17,9 +21,9 @@
 Note: Using the links provided here help to support these types of projects. Thank you for the support.  
 
 ## Wiring for the Wemos D1 Mini to the RGB Ring:
-RBB Pin -> D3  
-5V Pin -> VCC
-Ground -> Ground
+* Data (in) Pin -> D3  
+* 5V Pin -> VCC 5V 
+* Ground -> Ground
 
 
 ## 3D Printed Case by Qrome:  
@@ -50,7 +54,7 @@ NOTE: The Wemos D1 Mini requires a 2.4Ghz network.
 After connected to your WiFi network it will display the IP addressed assigned to it and that can be 
 used to open a browser to the Web Interface.  **Everything** can be configured there.
 
-<img src="images/screen1.png" alt="image" style="width:200px;height:auto;"> <img src="images/screen2.png" alt="image" style="width:200px;height:auto;"> <img src="images/screen3.png" alt="image" style="width:200px;height:auto;">
+<img src="images/screen1.png" alt="image" style="width:225px;height:auto;"> <img src="images/screen2.png" alt="image" style="width:225px;height:auto;"> <img src="images/screen3.png" alt="image" style="width:225px;height:auto;">
 
 ## Donate or Tip
 Please do not feel obligated, but donations and tips are warmly welcomed.  I have added the donation button at the request of a few people that wanted to contribute and show appreciation.  Thank you, and enjoy the application and project.  
