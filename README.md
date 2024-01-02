@@ -1,7 +1,14 @@
-# RGB LED Clock [STILL A WIP]
+# RGB LED Clock 
 
 ## Features:
-
+* Unique RGB Clock Display
+* Clock is an Anlog display of hours, minutes and seconds
+* Hour is Red
+* Minutes is Green
+* Seconds are Blue and (tick is white)
+* Offers Advanced Web Interface for changing settings
+* Select the UTC Offset for your time zone
+* Control the brightness
 
 ## Required Parts:
 * Wemos D1 Mini: https://amzn.to/2ImqD1n
@@ -23,21 +30,22 @@ It is recommended to use Arduino IDE.  You will need to configure Arduino IDE to
 * Enter http://arduino.esp8266.com/stable/package_esp8266com_index.json into Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.  This will add support for the Wemos D1 Mini to Arduino IDE.
 * Open Boards Manager from Tools > Board menu and install esp8266 platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 * Select Board:  "WeMos D1 R2 & mini"
-* Set 1M SPIFFS -- this project uses SPIFFS for saving and reading configuration settings.
+* Set 1M File System SPIFFS -- this project uses File System for saving and reading configuration settings on the chip.
 
 ## Loading Supporting Library Files in Arduino
 Use the Arduino guide for details on how to installing and manage libraries https://www.arduino.cc/en/Guide/Libraries  
 **Packages** -- the following packages and libraries are used (download and install):  
-WiFiManager.h --> https://github.com/tzapu/WiFiManager  
-Adafruit_NeoPixel.h --> Library Manager
+* WiFiManager.h --> https://github.com/tzapu/WiFiManager  
+* Adafruit_NeoPixel.h --> Library Manager
 
 ## Initial Configuration
-All settings may be managed from the Web Interface, however, you may update the **Settings.h** file manually -- but it is not required.  There is also an option to display current weather when the print is off-line.  
+All settings may be managed from the Web Interface, however, you may update the **Settings.h** file manually -- but it is not required.   
 NOTE: The settings in the Settings.h are the default settings for the first loading. After loading you will manage changes to the settings via the Web Interface. If you want to change settings again in the settings.h, you will need to erase the file system on the Wemos or use the “Reset Settings” option in the Web Interface.  
 
 ## Web Interface
 This project uses the **WiFiManager** so when it can't find the last network it was connected to 
-it will become a **AP Hotspot** -- connect to it with your phone and you can then enter your WiFi connection information.
+it will become a **AP Hotspot** -- connect to it with your phone and you can then enter your WiFi connection information.  
+NOTE: The Wemos D1 Mini requires a 2.4Ghz network.  
 
 After connected to your WiFi network it will display the IP addressed assigned to it and that can be 
 used to open a browser to the Web Interface.  **Everything** can be configured there.
@@ -47,11 +55,7 @@ Please do not feel obligated, but donations and tips are warmly welcomed.  I hav
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6VPMTLASLSKWE)
 
-## Contributors
-Contributing to this software is warmly welcomed. You can do this basically by
-forking from master, committing modifications and then making a pulling requests to be reviewed (follow the links above
-for operating guide).  Detailed comments are encouraged.  Adding change log and your contact into file header is encouraged.
-Thanks for your contribution.
+
 
 /* The MIT License (MIT)
 
