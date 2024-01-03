@@ -53,7 +53,7 @@ it will become a **AP Hotspot** -- connect to it with your phone and you can the
 
 NOTE: The Wemos D1 Mini requires a 2.4Ghz network.  
 
-The IP address given through DHCP from your router can be determined by the RGB flashing lights right after powering on the clock.  The lights will reveal the last octet (the fourth and final set of numbers in an IPv4 address) when it boots up.  Example, if the network you are connected to startes with 192.168.0.&ast; then the last octet could be revield by the flashing RED, GREEN, and BLUE colors in the clock face.  Example 192.168.0. $\color{red}{\textsf{1}}$ $\color{green}{\textsf{8}}$ $\color{blue}{\textsf{4}}$ would have Red = 1, Green = 8, and Blue = 4.  
+The IP address given through DHCP from your router can be determined by the RGB flashing lights right after powering on the clock.  The lights will reveal the last octet (the fourth and final set of numbers in an IPv4 address) when it boots up.  Example, if the network you are connected to startes with 192.168.0.&ast; then the last octet could be revield by the flashing $\color{red}{\textsf{RED}}$, $\color{lime}{\textsf{GREEN}}$, and $\color{blue}{\textsf{BLUE}}$ colors in the clock face.  Example 192.168.0.184 would have $\color{red}{\textsf{RED}}$ = 1, $\color{lime}{\textsf{GREEN}}$ = 8, and $\color{blue}{\textsf{BLUE}}$ = 4.  
 
 After connected to your WiFi network it will display the IP addressed assigned to it and that can be 
 used to open a browser to the Web Interface.  **Everything** can be configured there.
