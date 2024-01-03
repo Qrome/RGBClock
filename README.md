@@ -43,13 +43,18 @@ Use the Arduino guide for details on how to installing and manage libraries http
 * Adafruit_NeoPixel.h --> Library Manager
 
 ## Initial Configuration
-All settings may be managed from the Web Interface, however, you may update the **Settings.h** file manually -- but it is not required.   
+All settings may be managed from the Web Interface, however, you may update the **Settings.h** file manually -- but it is not required.   You can specify the default UTC offset in the **Settings.h** file or simply change it through the web interface after booting up.  
+
 NOTE: The settings in the Settings.h are the default settings for the first loading. After loading you will manage changes to the settings via the Web Interface. If you want to change settings again in the settings.h, you will need to erase the file system on the Wemos or use the “Reset Settings” option in the Web Interface.  
 
 ## Web Interface
 This project uses the **WiFiManager** so when it can't find the last network it was connected to 
 it will become a **AP Hotspot** -- connect to it with your phone and you can then enter your WiFi connection information.  
+
 NOTE: The Wemos D1 Mini requires a 2.4Ghz network.  
+
+The IP address given through DHCP from your router can be determined by the RGB flashing lights right after powering on the clock.  The lights will reveal the last octet (the fourth and final set of numbers in an IPv4 address) when it boots up.  Example, if the network you are connected to startes with 192.168.0.&ast; then the last octet could be revield by the flashing RED, GREEN, and BLUE colors in the clock face.  Example 192.168.0.<span style="color:red">1</span><span style="color:green">8</span><span style="color:blue">4</span> would have Red = 1, Green = 8, and Blue = 4.
+
 
 After connected to your WiFi network it will display the IP addressed assigned to it and that can be 
 used to open a browser to the Web Interface.  **Everything** can be configured there.
