@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include "Settings.h"
 
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 #define HOSTNAME "RGBClock-" 
 #define CONFIG "/conf.txt"
@@ -62,8 +62,10 @@ long second =  1000; // 1000 milliseconds in a second
 uint32_t HOUR_COLOR   = pixels.Color(255, 0, 0);
 uint32_t MINUTE_COLOR = pixels.Color(0, 255, 0);
 uint32_t SECOND_COLOR = pixels.Color(0, 0, 255);
-uint32_t fire_color   = pixels.Color(80,35, 0);
-uint32_t off_color    = pixels.Color(0, 0, 0);
+const uint32_t fire_color   = pixels.Color(80,35, 0);
+const uint32_t off_color    = pixels.Color(0, 0, 0);
+const uint32_t lite_color   = pixels.Color(5, 5, 5);
+uint32_t hot_second   = lite_color;
 
 //declairing prototypes
 void configModeCallback (WiFiManager *myWiFiManager);
@@ -82,6 +84,7 @@ static const char WEB_ACTIONS[] PROGMEM =  "<a class='w3-bar-item w3-button' hre
 static const char CLOCK_FORM[] PROGMEM = "<p>UTC Time Offset <select <select class='w3-option w3-padding' name='utcoffset'>%UTCOFFSET%</select>"
                       "<a class='w3-button' alt='About UTC Offset' href='https://en.wikipedia.org/wiki/UTC_offset' target='_blank'><i class='fa fa-question-circle'></i></a></p>"
                       "<p>Clock Sync Refresh (minutes) <select class='w3-option w3-padding' name='refresh'>%OPTIONS%</select></p>"
+                      "<p><input name='secondtick' class='w3-check w3-margin-top' type='checkbox' %SECONDTICK%> Show Seconds Tick (white)</p>"
                       "<p><label>Brightness %</label>"
                       "<input type='range' value='%BRIGHT%' min='1' max='100' oninput='this.nextElementSibling.value = this.value' name='bright'><output>%BRIGHT%</output></p>";
                             
@@ -163,7 +166,7 @@ void setup() {
   pinMode(externalLight, OUTPUT);
 
   readSettings();
- 
+
   pixels.begin();
   pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS);
   pixels.show();
@@ -233,8 +236,6 @@ void setup() {
   IPAddress ip = WiFi.localIP(); //IPAddress(192, 168, 0, 9);
   displayIP(ip[3]);
   
-  applyBrightness();
-  
   flashLED(1, 100);
   Serial.println("*** Leaving setup()");
 }
@@ -271,9 +272,9 @@ void updateLED() {
     }
   }
 
-  pixels.fill(pixels.Color(0, 0, 0), 0, NUMPIXELS); // set all off
+  pixels.fill(off_color, 0, NUMPIXELS); // set all off
 
-  pixels.setPixelColor(hotSecondsLED, pixels.Color(5, 5, 5));
+  pixels.setPixelColor(hotSecondsLED, hot_second);
   
   if (secondsLED == minutesLED && minutesLED == hoursLED) {
     pixels.setPixelColor(secondsLED, pixels.Color(255, 255, 255));
@@ -339,7 +340,7 @@ void displayIP(byte octet) {
     RollingFire(85);
     delay(random(40,200));
   }
-  pixels.fill(pixels.Color(0, 40, 0), 0, NUMPIXELS); // Green For Loading
+  pixels.fill(pixels.Color(0, 30, 0), 0, NUMPIXELS); // Green For Loading
   pixels.show();
 }
 
@@ -349,6 +350,11 @@ void applyBrightness() {
   HOUR_COLOR   = pixels.Color(adjusted, 0, 0);
   MINUTE_COLOR = pixels.Color(0, adjusted, 0);
   SECOND_COLOR = pixels.Color(0, 0, adjusted);
+  if (!useHotSeconds) {
+    hot_second = off_color;
+  } else {
+    hot_second = lite_color;
+  }
 }
 
 void getUpdateTime() {
@@ -388,6 +394,7 @@ void handleUpdateConfig() {
   themeColor = server.arg("theme");
   UtcOffset = server.arg("utcoffset").toFloat();
   brightness = server.arg("bright").toInt();
+  useHotSeconds = server.hasArg("secondtick");
   writeSettings();
   lastEpoch = 0;
   redirectHome();
@@ -432,6 +439,12 @@ void handleConfigure() {
   String options = "<option>10</option><option>15</option><option>20</option><option>30</option><option>60</option>";
   options.replace(">"+String(minutesBetweenDataRefresh)+"<", " selected>"+String(minutesBetweenDataRefresh)+"<");
   form.replace("%OPTIONS%", options);
+
+  String hasHotSeconds = "";
+  if (useHotSeconds) {
+    hasHotSeconds = "checked='checked'";
+  }
+  form.replace("%SECONDTICK%", hasHotSeconds);
 
   server.sendContent(form);
 
@@ -607,6 +620,7 @@ void writeSettings() {
     f.println("UtcOffset=" + String(UtcOffset));
     f.println("refreshRate=" + String(minutesBetweenDataRefresh));
     f.println("brightness=" + String(brightness));
+    f.println("useHotSeconds=" + String(useHotSeconds));
     f.println("themeColor=" + themeColor);
     f.println("www_username=" + String(www_username));
     f.println("www_password=" + String(www_password));;
@@ -636,6 +650,10 @@ void readSettings() {
     if (line.indexOf("brightness=") >= 0) {
       brightness = line.substring(line.lastIndexOf("brightness=") + 11).toInt();
       Serial.println("brightness=" + String(brightness));
+    }
+    if (line.indexOf("useHotSeconds=") >= 0) {
+      useHotSeconds = line.substring(line.lastIndexOf("useHotSeconds=") + 14).toInt();
+      Serial.println("useHotSeconds=" + String(useHotSeconds));
     }
     if (line.indexOf("refreshRate=") >= 0) {
       minutesBetweenDataRefresh = line.substring(line.lastIndexOf("refreshRate=") + 12).toInt();

@@ -51,8 +51,9 @@ SOFTWARE.
 
 // Date and Time
 float UtcOffset = -7; // Hour offset from GMT for your timezone
-int minutesBetweenDataRefresh = 30; // this is time refresh only
+int minutesBetweenDataRefresh = 60; // this is time refresh only
 int brightness = 50;  // percentage of brightness of the main clock RGB from 1 - 100
+boolean useHotSeconds = true;  // this is the white seconds ticking around the face
 
 // Webserver
 const int WEBSERVER_PORT = 80; // The port you can access this device on over HTTP
